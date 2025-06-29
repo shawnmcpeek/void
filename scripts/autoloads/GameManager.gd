@@ -4,7 +4,9 @@ var is_game_over = false
 var game_over_scene = preload("res://scenes/ui/game_over/GameOver.tscn") # Change path if needed
 
 func _ready():
-	# Connect to player's signal
+	call_deferred("_connect_player_signal")
+
+func _connect_player_signal():
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		player.player_died.connect(game_over)

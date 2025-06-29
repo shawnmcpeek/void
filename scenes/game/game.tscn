@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://6m55b72570fq"]
+[gd_scene load_steps=8 format=3 uid="uid://6m55b72570fq"]
 
 [ext_resource type="Texture2D" uid="uid://dojpvoe61kk1a" path="res://assets/images/player_icon.png" id="1_7h61r"]
+[ext_resource type="Script" uid="uid://cu3xqjbw88nlt" path="res://scripts/RandomBackground.gd" id="1_lfrn8"]
 [ext_resource type="Script" uid="uid://cmhl23h1vntbe" path="res://scripts/player/sprite_2d.gd" id="1_sul5r"]
 [ext_resource type="Script" uid="uid://bus4hpuuiexjb" path="res://scenes/game/spawner.gd" id="3_0sr1o"]
 [ext_resource type="PackedScene" uid="uid://c6yok43yp7pym" path="res://scenes/ui/energy_bar/energy_bar.tscn" id="4_kelw5"]
@@ -11,19 +12,34 @@
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 2
 
-[node name="Game" type="Node2D"]
+[node name="Game" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 
-[node name="Player" type="Area2D" parent="." groups=["player"]]
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+script = ExtResource("1_lfrn8")
+
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="Player" type="Area2D" parent="Node2D" groups=["player"]]
 scale = Vector2(0.25, 0.25)
 script = ExtResource("1_sul5r")
 
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
+[node name="Sprite2D" type="Sprite2D" parent="Node2D/Player"]
 texture = ExtResource("1_7h61r")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/Player"]
 shape = SubResource("CircleShape2D_7h61r")
 
-[node name="ObstacleSpawner" type="Node2D" parent="."]
+[node name="ObstacleSpawner" type="Node2D" parent="Node2D"]
 scale = Vector2(2, 2)
 script = ExtResource("3_0sr1o")
 difficulty_curve = SubResource("Curve_0sr1o")
