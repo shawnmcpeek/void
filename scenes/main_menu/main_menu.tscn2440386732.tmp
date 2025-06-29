@@ -1,0 +1,357 @@
+[gd_scene load_steps=10 format=3 uid="uid://n8rqvmjdwutp"]
+
+[ext_resource type="PackedScene" uid="uid://hmx6o472ropw" path="res://addons/maaacks_options_menus/base/scenes/menus/options_menu/master_options_menu_with_tabs.tscn" id="2_qvrrd"]
+[ext_resource type="PackedScene" uid="uid://osxulxw2oas3" path="res://addons/maaacks_menus_template/base/scenes/credits/scrollable_credits.tscn" id="3_73am8"]
+[ext_resource type="Script" uid="uid://1nf36h0gms3q" path="res://addons/maaacks_options_menus/base/scripts/capture_focus.gd" id="4_l1ebe"]
+[ext_resource type="PackedScene" uid="uid://bkcsjsk2ciff" path="res://addons/maaacks_music_controller/base/scenes/music_players/background_music_player.tscn" id="4_w8sbm"]
+[ext_resource type="Script" uid="uid://b5oej1q4h7jvh" path="res://addons/maaacks_menus_template/base/scripts/ui_sound_controller.gd" id="6_bs342"]
+[ext_resource type="Texture2D" uid="uid://bttueyihkjm5c" path="res://assets/images/void.png" id="6_thkx5"]
+
+[sub_resource type="GDScript" id="GDScript_3ovsr"]
+script/source = "
+extends Control
+
+## Defines the path to the game scene. Hides the play button if empty.
+@export_file(\"*.tscn\") var game_scene_path : String
+@export var options_packed_scene : PackedScene
+@export var credits_packed_scene : PackedScene
+
+var options_scene
+var credits_scene
+var sub_menu
+
+func load_game_scene() -> void:
+	SceneLoader.load_scene(game_scene_path)
+
+func new_game() -> void:
+	load_game_scene()
+
+func _open_sub_menu(menu : Control) -> void:
+	sub_menu = menu
+	sub_menu.show()
+	%BackButton.show()
+	%MenuContainer.hide()
+
+func _close_sub_menu() -> void:
+	if sub_menu == null:
+		return
+	sub_menu.hide()
+	sub_menu = null
+	%BackButton.hide()
+	%MenuContainer.show()
+
+func _event_is_mouse_button_released(event : InputEvent) -> bool:
+	return event is InputEventMouseButton and not event.is_pressed()
+
+func _input(event : InputEvent) -> void:
+	if event.is_action_released(\"ui_cancel\"):
+		if sub_menu:
+			_close_sub_menu()
+		else:
+			get_tree().quit()
+	if event.is_action_released(\"ui_accept\") and get_viewport().gui_get_focus_owner() == null:
+		%MenuButtonsBoxContainer.focus_first()
+
+func _hide_exit_for_web() -> void:
+	if OS.has_feature(\"web\"):
+		%ExitButton.hide()
+
+func _hide_new_game_if_unset() -> void:
+	if game_scene_path.is_empty():
+		%NewGameButton.hide()
+
+func _add_or_hide_options() -> void:
+	if options_packed_scene == null:
+		%OptionsButton.hide()
+	else:
+		options_scene = options_packed_scene.instantiate()
+		options_scene.hide()
+		%OptionsContainer.call_deferred(\"add_child\", options_scene)
+
+func _add_or_hide_credits() -> void:
+	if credits_packed_scene == null:
+		%CreditsButton.hide()
+	else:
+		credits_scene = credits_packed_scene.instantiate()
+		credits_scene.hide()
+		if credits_scene.has_signal(\"end_reached\"):
+			credits_scene.connect(\"end_reached\", _on_credits_end_reached)
+		%CreditsContainer.call_deferred(\"add_child\", credits_scene)
+
+func _ready() -> void:
+	_hide_exit_for_web()
+	_add_or_hide_options()
+	_add_or_hide_credits()
+	_hide_new_game_if_unset()
+
+func _on_new_game_button_pressed() -> void:
+	new_game()
+
+func _on_options_button_pressed() -> void:
+	_open_sub_menu(options_scene)
+
+func _on_credits_button_pressed() -> void:
+	_open_sub_menu(credits_scene)
+
+func _on_exit_button_pressed() -> void:
+	get_tree().quit()
+
+func _on_credits_end_reached() -> void:
+	if sub_menu == credits_scene:
+		_close_sub_menu()
+
+func _on_back_button_pressed() -> void:
+	_close_sub_menu()
+"
+
+[sub_resource type="GDScript" id="GDScript_5seab"]
+script/source = "@tool
+extends Label
+class_name ConfigVersionLabel
+## Displays the value of `application/config/version`, set in project settings.
+
+const NO_VERSION_STRING : String = \"0.0.0\"
+
+## Prefixes the value of `application/config/version` when displaying to the user.
+@export var version_prefix : String = \"v\"
+
+func update_version_label() -> void:
+	var config_version : String = ProjectSettings.get_setting(\"application/config/version\", NO_VERSION_STRING)
+	if config_version.is_empty():
+		config_version = NO_VERSION_STRING
+	text = version_prefix + config_version
+
+func _ready() -> void:
+	update_version_label()
+"
+
+[sub_resource type="GDScript" id="GDScript_4xg86"]
+script/source = "@tool
+extends Label
+class_name ConfigNameLabel
+## Displays the value of `application/config/name`, set in project settings.
+
+const NO_NAME_STRING : String = \"Title\"
+
+@export var lock : bool = false
+
+func update_name_label():
+	if lock: return
+	var config_name : String = ProjectSettings.get_setting(\"application/config/name\", NO_NAME_STRING)
+	if config_name.is_empty():
+		config_name = NO_NAME_STRING
+	text = config_name
+
+func _ready():
+	update_name_label()
+"
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_3ovsr")
+options_packed_scene = ExtResource("2_qvrrd")
+credits_packed_scene = ExtResource("3_73am8")
+
+[node name="UISoundController" type="Node" parent="."]
+script = ExtResource("6_bs342")
+
+[node name="BackgroundMusicPlayer" parent="." instance=ExtResource("4_w8sbm")]
+bus = &"Master"
+
+[node name="BackgroundTextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("6_thkx5")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VersionMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VersionContainer" type="Control" parent="VersionMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="VersionLabel" type="Label" parent="VersionMargin/VersionContainer"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -88.0
+offset_top = -26.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "v0.0.0"
+horizontal_alignment = 2
+script = SubResource("GDScript_5seab")
+
+[node name="MenuContainer" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleMargin" type="MarginContainer" parent="MenuContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 24
+
+[node name="TitleContainer" type="Control" parent="MenuContainer/TitleMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TitleLabel" type="Label" parent="MenuContainer/TitleMargin/TitleContainer"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 67.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 48
+text = "void"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = SubResource("GDScript_4xg86")
+
+[node name="SubTitleMargin" type="MarginContainer" parent="MenuContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 92
+
+[node name="SubTitleContainer" type="Control" parent="MenuContainer/SubTitleMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="SubTitleLabel" type="Label" parent="MenuContainer/SubTitleMargin/SubTitleContainer"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 34.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 24
+text = "Subtitle"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MenuButtonsMargin" type="MarginContainer" parent="MenuContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_top = 136
+theme_override_constants/margin_bottom = 8
+
+[node name="MenuButtonsContainer" type="Control" parent="MenuContainer/MenuButtonsMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MenuButtonsBoxContainer" type="BoxContainer" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -104.0
+offset_right = 64.0
+offset_bottom = 104.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+alignment = 1
+vertical = true
+script = ExtResource("4_l1ebe")
+
+[node name="NewGameButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "New Game"
+
+[node name="OptionsButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Options"
+
+[node name="CreditsButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Credits"
+
+[node name="ExitButton" type="Button" parent="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Exit"
+
+[node name="OptionsContainer" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CreditsContainer" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 64
+
+[node name="FlowControlContainer" type="MarginContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="FlowControl" type="Control" parent="FlowControlContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="BackButton" type="Button" parent="FlowControlContainer/FlowControl"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+offset_right = 45.0
+grow_vertical = 0
+text = "Back"
+
+[connection signal="pressed" from="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
+[connection signal="pressed" from="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer/OptionsButton" to="." method="_on_options_button_pressed"]
+[connection signal="pressed" from="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
+[connection signal="pressed" from="MenuContainer/MenuButtonsMargin/MenuButtonsContainer/MenuButtonsBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]
+[connection signal="pressed" from="FlowControlContainer/FlowControl/BackButton" to="." method="_on_back_button_pressed"]

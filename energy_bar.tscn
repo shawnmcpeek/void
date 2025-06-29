@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6yok43yp7pym"]
+
+[ext_resource type="Script" uid="uid://bb1mubx31nu50" path="res://EnergyBar.gd" id="1_rdnti"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pgd3d"]
+
+[node name="EnergyBar" type="Area2D"]
+script = ExtResource("1_rdnti")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_pgd3d")
