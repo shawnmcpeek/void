@@ -14,7 +14,7 @@ point_count = 2
 [node name="Game" type="Node2D"]
 
 [node name="Player" type="Area2D" parent="."]
-scale = Vector2(0.1, 0.1)
+scale = Vector2(0.25, 0.25)
 script = ExtResource("1_sul5r")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
@@ -24,6 +24,7 @@ texture = ExtResource("1_7h61r")
 shape = SubResource("CircleShape2D_7h61r")
 
 [node name="ObstacleSpawner" type="Node2D" parent="."]
+scale = Vector2(2, 2)
 script = ExtResource("3_0sr1o")
 difficulty_curve = SubResource("Curve_0sr1o")
 obstacle_scenes = Array[PackedScene]([ExtResource("4_kelw5")])
