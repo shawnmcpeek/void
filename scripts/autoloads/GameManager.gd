@@ -1,7 +1,7 @@
 extends Node
 
 var is_game_over = false
-var game_over_scene = preload("res://ui/GameOver.tscn") # Change path if needed
+var game_over_scene = preload("res://scenes/ui/game_over/GameOver.tscn") # Change path if needed
 
 func _ready():
 	# Connect to player's signal

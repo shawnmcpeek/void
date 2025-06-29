@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://dojpvoe61kk1a" path="res://assets/images/player_icon.png" id="1_7h61r"]
 [ext_resource type="Script" uid="uid://cmhl23h1vntbe" path="res://scripts/player/sprite_2d.gd" id="1_sul5r"]
 [ext_resource type="Script" uid="uid://bus4hpuuiexjb" path="res://scenes/game/spawner.gd" id="3_0sr1o"]
-[ext_resource type="PackedScene" uid="uid://c6yok43yp7pym" path="res://energy_bar.tscn" id="4_kelw5"]
+[ext_resource type="PackedScene" uid="uid://c6yok43yp7pym" path="res://scenes/ui/energy_bar/energy_bar.tscn" id="4_kelw5"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7h61r"]
 
@@ -13,7 +13,7 @@ point_count = 2
 
 [node name="Game" type="Node2D"]
 
-[node name="Player" type="Area2D" parent="."]
+[node name="Player" type="Area2D" parent="." groups=["player"]]
 scale = Vector2(0.25, 0.25)
 script = ExtResource("1_sul5r")
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c6yok43yp7pym"]
 
-[ext_resource type="Script" uid="uid://bb1mubx31nu50" path="res://EnergyBar.gd" id="1_rdnti"]
+[ext_resource type="Script" path="res://scenes/ui/energy_bar/EnergyBar.gd" id="1_rdnti"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pgd3d"]
 
