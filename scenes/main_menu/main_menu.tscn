@@ -12,6 +12,13 @@ bus = &"Master"
 
 [node name="BackgroundTextureRect" parent="." index="2"]
 texture = ExtResource("3_ob46e")
+stretch_mode = 6
+
+[node name="TitleContainer" parent="MenuContainer/TitleMargin" index="0"]
+visible = false
 
 [node name="TitleLabel" parent="MenuContainer/TitleMargin/TitleContainer" index="0"]
-text = "void"
+text = "The Void"
+
+[node name="SubTitleLabel" parent="MenuContainer/SubTitleMargin/SubTitleContainer" index="0"]
+text = "Consume the Dark"

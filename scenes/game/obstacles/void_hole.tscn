@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://by5qyt0h7hci4"]
+
+[ext_resource type="Script" uid="uid://6u30fap2wfd1" path="res://scripts/obstacles/ObstacleMovement.gd" id="1_cn1wx"]
+[ext_resource type="Shader" uid="uid://cxvc4my5q4l8q" path="res://scripts/obstacles/void_hole_circle.gdshader" id="1_u7ask"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cn1wx"]
+shader = ExtResource("1_u7ask")
+shader_parameter/core_radius = 0.4
+shader_parameter/core_color = Color(0, 0, 0, 1)
+shader_parameter/edge_softness = 0.02
+shader_parameter/glow_color = Color(0.580392, 0, 1, 1)
+shader_parameter/glow_radius = 0.5
+shader_parameter/glow_intensity = 1.5
+shader_parameter/glow_falloff = 0.1
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qc8hb"]
+radius = 50.0
+
+[node name="VoidHole" type="Area2D"]
+script = ExtResource("1_cn1wx")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_cn1wx")
+offset_right = 100.0
+offset_bottom = 100.0
+color = Color(0.237539, 0.237539, 0.237539, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_qc8hb")
