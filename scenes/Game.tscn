@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://7okun65k3o77"]
+
+[ext_resource type="Script" uid="uid://bgp2libfnbd27" path="res://scripts/Player.gd" id="1_qbsmt"]
+[ext_resource type="Script" uid="uid://dscbuldmu3co" path="res://scripts/LevelManager.gd" id="4_ibkli"]
+[ext_resource type="Texture2D" uid="uid://dlguupdqkleu5" path="res://assets/cone.png" id="cone_texture"]
+[ext_resource type="Texture2D" uid="uid://bkcl6w4ekdr80" path="res://assets/players/2D bird's eye view c.png" id="player_sprite"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qbsmt"]
+
+[node name="Game" type="Node2D"]
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(0, 500)
+script = ExtResource("1_qbsmt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("CircleShape2D_qbsmt")
+debug_color = Color(0.839809, 0.283019, 0.658492, 0.42)
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("player_sprite")
+
+[node name="PointLight2D" type="PointLight2D" parent="Player"]
+scale = Vector2(0.75, 0.75)
+color = Color(1, 0.9, 0.7, 1)
+energy = 2.0
+shadow_enabled = true
+texture = ExtResource("cone_texture")
+offset = Vector2(0, -450)
+
+[node name="LevelManager" type="Node2D" parent="."]
+script = ExtResource("4_ibkli")
+
+[node name="Camera2D" type="Camera2D" parent="."]

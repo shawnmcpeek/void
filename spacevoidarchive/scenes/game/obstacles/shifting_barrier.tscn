@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://kl35ukjqgbkr"]
+
+[ext_resource type="Script" uid="uid://6u30fap2wfd1" path="res://scripts/obstacles/ObstacleMovement.gd" id="1_2y2ob"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hq37o"]
+size = Vector2(300, 20)
+
+[node name="ShiftingBarrier" type="Area2D" groups=["shifting_barrier"]]
+script = ExtResource("1_2y2ob")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.277528, 0.277528, 0.277528, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(148, 9)
+shape = SubResource("RectangleShape2D_hq37o")
